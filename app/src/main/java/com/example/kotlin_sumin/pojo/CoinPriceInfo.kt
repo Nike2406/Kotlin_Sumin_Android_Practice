@@ -2,6 +2,8 @@ package com.example.kotlin_sumin.pojo
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.kotlin_sumin.api.ApiFactory.BASE_IMAGE_URL
+import com.example.kotlin_sumin.utils.convertTimestampToTime
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.annotations.NonNull
@@ -197,4 +199,12 @@ data class CoinPriceInfo (
     @SerializedName("IMAGEURL")
     @Expose
     val imageUrl: String? = null,
-)
+) {
+    fun getFormattedTime(): String {
+        return convertTimestampToTime(lastUpdate?.toLong())
+    }
+
+    fun getFullImageUrl(): String {
+        return BASE_IMAGE_URL + imageUrl
+    }
+}
