@@ -3,6 +3,7 @@ package com.example.kotlin_sumin
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import com.example.kotlin_sumin.api.ApiFactory
 import com.example.kotlin_sumin.database.AppDatabase
 import com.example.kotlin_sumin.pojo.CoinPriceInfo
@@ -10,6 +11,7 @@ import com.example.kotlin_sumin.pojo.CoinPriceInfoRawData
 import com.google.gson.Gson
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class CoinViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -18,7 +20,15 @@ class CoinViewModel(application: Application) : AndroidViewModel(application) {
 
     val priceList = db.coinPriceInfoDao().getPriceList()
 
-    fun loadData() {
+    init {
+        loadData()
+    }
+
+    fun getDetailInfo(fSym: String): LiveData<CoinPriceInfo> {
+        return db.coinPriceInfoDao().getPriceInfoAboutCoin(fSym)
+    }
+
+    private fun loadData() {
         val disposable = ApiFactory.apiService.getTopCoinsInfo(limit = 30)
             .map { it ->
                 it.data
@@ -28,6 +38,9 @@ class CoinViewModel(application: Application) : AndroidViewModel(application) {
             }
             .flatMap { ApiFactory.apiService.getFullPriceList(fSym = it) }
             .map { getPriceListFormRawData(it) }
+            .delaySubscription(10, TimeUnit.SECONDS) // задержка на 10 секунд
+            .repeat() // выполняется пока успешно
+            .retry() // попытка повторить при неудаче
             .subscribeOn(Schedulers.io())
             .subscribe({
                 db.coinPriceInfoDao().insertPriceList(it)
