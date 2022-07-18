@@ -1,15 +1,11 @@
 package com.example.kotlin_sumin
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kotlin_sumin.adapters.CoinInfoAdapter
-import com.example.kotlin_sumin.databinding.ActivityCoinPriceListBinding
-import com.example.kotlin_sumin.databinding.ItemCoinInfoBinding
 import com.example.kotlin_sumin.pojo.CoinPriceInfo
 
 class CoinPriceListActivity : AppCompatActivity() {
