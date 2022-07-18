@@ -1,33 +1,33 @@
 package com.example.kotlin_sumin
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.example.kotlin_sumin.api.ApiFactory
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var editTextName: EditText
-    lateinit var buttonSave: Button
-    lateinit var textViewName: TextView
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        val disposable = ApiFactory.apiService.getFullPriceList(fSym = "BTC,ETH")
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.io())
+            .subscribe({
+                Log.d("TEST_OF_LOADING_DATA", it.toString())
+            },
+                {
+                    it.message?.let { it1 -> Log.d("TEST_OF_LOADING_DATA", it1) }
+                })
+        compositeDisposable.add(disposable)
+    }
 
-        editTextName = findViewById(R.id.editTextName)
-        buttonSave = findViewById(R.id.buttonSave)
-        textViewName = findViewById(R.id.textViewName)
-
-
-        // Старый вариант без лямбды
-        buttonSave.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val name = editTextName.text.toString().trim()
-                textViewName.text = "Привет, $name!"
-            }
-        })
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.dispose()
     }
 }

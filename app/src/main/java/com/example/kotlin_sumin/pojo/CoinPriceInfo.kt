@@ -1,8 +1,11 @@
 package com.example.kotlin_sumin.pojo
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.google.gson.annotations.Expose
 
+@Entity(tableName = "full_price_list")
 data class CoinPriceInfo (
     @SerializedName("TYPE")
     @Expose
@@ -12,6 +15,7 @@ data class CoinPriceInfo (
     @Expose
     val market: String? = null,
 
+    @PrimaryKey
     @SerializedName("FROMSYMBOL")
     @Expose
     val fromSymbol: String? = null,
